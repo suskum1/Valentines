@@ -2,9 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Valentine?</title>
     <style>
+        * {
+            -webkit-tap-highlight-color: transparent; /* Removes the gray box when tapping on iPhone */
+            touch-action: manipulation;
+        }
         body {
             display: flex;
             flex-direction: column;
@@ -12,34 +16,46 @@
             justify-content: center;
             height: 100vh;
             margin: 0;
+            overflow: hidden; 
             font-family: 'Arial', sans-serif;
             background-color: #ffe6e6;
             text-align: center;
         }
-        h1 { color: #d63384; font-size: 2.5rem; }
-        .buttons { margin-top: 20px; position: relative; width: 100%; height: 100px; }
+        h1 { color: #d63384; font-size: 1.8rem; padding: 0 20px; }
+        .buttons { margin-top: 30px; position: relative; width: 100%; height: 300px; }
         button {
             padding: 15px 30px;
             font-size: 1.2rem;
-            border-radius: 10px;
+            border-radius: 12px;
             border: none;
             cursor: pointer;
-            transition: 0.3s;
+            position: absolute;
+            transition: top 0.2s ease, left 0.2s ease; /* Smooth floating movement */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
-        #yesBtn { background-color: #ff4d6d; color: white; margin-right: 20px; }
+        #yesBtn { 
+            background-color: #ff4d6d; 
+            color: white; 
+            left: 50%; 
+            top: 20%;
+            transform: translateX(-110%);
+            z-index: 10;
+        }
         #noBtn {
             background-color: #6c757d;
             color: white;
-            position: absolute;
+            left: 50%;
+            top: 20%;
+            transform: translateX(10%);
         }
-        .success-container { display: none; }
-        img { width: 300px; border-radius: 15px; margin-top: 20px; }
+        .success-container { display: none; padding: 20px; }
+        img { width: 90%; max-width: 320px; border-radius: 15px; margin-top: 20px; }
     </style>
 </head>
 <body>
 
     <div id="main-content">
-        <h1 id="question">Will you be my Valentine? ❤️</h1>
+        <h1>Will you be my Valentine? ❤️</h1>
         <div class="buttons">
             <button id="yesBtn">Yes</button>
             <button id="noBtn">No</button>
@@ -48,7 +64,7 @@
 
     <div id="success-content" class="success-container">
         <h1>Woohoo, knew it bitch! 😂</h1>
-        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHIybTVqZzR3bmZqZzR3bmZqZzR3bmZqZzR3bmZqZzR3bmZqJmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/l0HlFZ3c4NENKAD3G/giphy.gif">
+        <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHY5Mmt3ZzR3bmZqZzR3bmZqZzR3bmZqZzR3bmZqZzR3bmZqJmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/l0HlFZ3c4NENKAD3G/giphy.gif" alt="Happy Dance">
     </div>
 
     <script>
@@ -57,19 +73,28 @@
         const mainContent = document.getElementById('main-content');
         const successContent = document.getElementById('success-content');
 
-        // Logic to move the 'No' button
-        noBtn.addEventListener('mouseover', moveButton);
-        noBtn.addEventListener('touchstart', moveButton); // For her iPhone/your Fold
-
-        function moveButton() {
-            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
-            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
+        const moveButton = (e) => {
+            if (e) e.preventDefault(); // This is the magic line for iPhone
+            
+            // Keeps the button within the middle 80% of the screen so it doesn't hide behind edges
+            const x = Math.random() * (window.innerWidth * 0.7);
+            const y = Math.random() * (window.innerHeight * 0.7);
             
             noBtn.style.left = `${x}px`;
             noBtn.style.top = `${y}px`;
-        }
+            noBtn.style.transform = 'none';
+        };
 
-        // Logic for 'Yes' click
+        // For Mouse users
+        noBtn.addEventListener('mouseover', moveButton);
+        
+        // For iPhone/Touch users
+        noBtn.addEventListener('touchstart', moveButton);
+        noBtn.addEventListener('click', (e) => {
+            // Extra safety: if she somehow clicks it, move it anyway
+            moveButton(e);
+        });
+
         yesBtn.addEventListener('click', () => {
             mainContent.style.display = 'none';
             successContent.style.display = 'block';
